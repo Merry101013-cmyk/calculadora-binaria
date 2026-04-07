@@ -2,72 +2,130 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Calculadora Binaria</title>
+<title>Calculadora Binaria UCN</title>
+
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        background: #0b1a2b;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-    }
+body {
+    font-family: Arial;
+    background: #0b1a2b;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
 
-    .calc {
-        background: #f2f2f2;
-        padding: 20px;
-        border-radius: 15px;
-        width: 260px;
-        box-shadow: 0 0 15px rgba(0,0,0,0.5);
-    }
+/* CONTENEDOR GENERAL */
+.container {
+    display: flex;
+    gap: 20px;
+}
 
-    .display {
-        background: black;
-        color: #00ffcc;
-        font-size: 20px;
-        padding: 10px;
-        margin-bottom: 10px;
-        text-align: right;
-        border-radius: 8px;
-    }
+/* CALCULADORA */
+.calc {
+    background: #f2f2f2;
+    padding: 15px;
+    border-radius: 15px;
+    width: 260px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+}
 
-    button {
-        width: 55px;
-        height: 45px;
-        margin: 3px;
-        font-size: 16px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-    }
+/* LOGO */
+.logo {
+    width: 100%;
+    margin-bottom: 10px;
+}
 
-    .num { background: #4dd0e1; }
-    .op { background: #ffe082; }
-    .control { background: #ef5350; color: white; }
-    .igual { background: #66bb6a; width: 100%; }
+/* DISPLAY */
+.display {
+    background: black;
+    color: #00ffcc;
+    font-size: 20px;
+    padding: 10px;
+    margin-bottom: 10px;
+    text-align: right;
+    border-radius: 8px;
+}
+
+/* BOTONES */
+button {
+    width: 55px;
+    height: 45px;
+    margin: 3px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+/* EFECTO CLICK */
+button:active {
+    transform: scale(0.9);
+    box-shadow: inset 0 0 8px black;
+}
+
+/* COLORES */
+.num { background: #4dd0e1; }
+.op { background: #ffe082; }
+.control { background: #ef5350; color: white; }
+.igual { background: #66bb6a; width: 100%; }
+
+/* PANEL DERECHO */
+.panel {
+    width: 250px;
+    background: #ffffff;
+    border-radius: 15px;
+    padding: 10px;
+    font-size: 14px;
+    overflow-y: auto;
+    height: 350px;
+}
+
+.panel h3 {
+    text-align: center;
+}
+
+.log {
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 5px;
+}
 </style>
 </head>
 
 <body>
 
-<div class="calc">
-    <div class="display" id="display">0</div>
+<div class="container">
 
-    <!-- Controles -->
-    <button class="control" onclick="clearAll()">AC</button>
-    <button class="control" onclick="deleteOne()">CE</button>
-    <button class="op" onclick="setOp('+')">+</button>
-    <button class="op" onclick="setOp('-')">-</button>
+    <!-- CALCULADORA -->
+    <div class="calc">
 
-    <button class="op" onclick="setOp('*')">×</button>
-    <button class="op" onclick="setOp('/')">÷</button>
-    <button class="op" onclick="complemento2()">C2</button>
+        <!-- LOGO -->
+        <img src="ciber-logo.png" class="logo">
 
-    <button class="igual" onclick="calcular()">=</button>
+        <div class="display" id="display">0</div>
 
-    <!-- Binario -->
-    <button class="num" onclick="add('1')">1</button>
-    <button class="num" onclick="add('0')">0</button>
+        <button class="control" onclick="clearAll()">AC</button>
+        <button class="control" onclick="deleteOne()">CE</button>
+        <button class="op" onclick="setOp('+')">+</button>
+        <button class="op" onclick="setOp('-')">-</button>
+
+        <button class="op" onclick="setOp('*')">×</button>
+        <button class="op" onclick="setOp('/')">÷</button>
+        <button class="op" onclick="complemento2()">C2</button>
+
+        <button class="igual" onclick="calcular()">=</button>
+
+        <button class="num" onclick="add('1')">1</button>
+        <button class="num" onclick="add('0')">0</button>
+    </div>
+
+    <!-- PANEL PROCEDIMIENTO -->
+    <div class="panel">
+        <h3>Procedimiento</h3>
+        <div id="log"></div>
+    </div>
+
 </div>
 
 <script>
@@ -79,6 +137,12 @@ function actualizarDisplay() {
     document.getElementById("display").innerText = valor || "0";
 }
 
+function agregarLog(texto) {
+    let log = document.getElementById("log");
+    log.innerHTML += `<div class="log">${texto}</div>`;
+    log.scrollTop = log.scrollHeight;
+}
+
 function add(num) {
     valor += num;
     actualizarDisplay();
@@ -88,6 +152,7 @@ function clearAll() {
     valor = "";
     operador = "";
     memoria = "";
+    document.getElementById("log").innerHTML = "";
     actualizarDisplay();
 }
 
@@ -97,7 +162,6 @@ function deleteOne() {
 }
 
 function setOp(op) {
-    if (valor === "") return;
     memoria = valor;
     operador = op;
     valor = "";
@@ -112,11 +176,12 @@ function decimalABinario(num) {
 }
 
 function calcular() {
-    if (!memoria || !valor) return;
-
     let a = binarioADecimal(memoria);
     let b = binarioADecimal(valor);
     let resultado;
+
+    agregarLog(`Operación: ${memoria} ${operador} ${valor}`);
+    agregarLog(`Decimal: ${a} ${operador} ${b}`);
 
     switch (operador) {
         case '+': resultado = a + b; break;
@@ -125,21 +190,21 @@ function calcular() {
         case '/': resultado = Math.floor(a / b); break;
     }
 
-    valor = decimalABinario(resultado);
+    let bin = decimalABinario(resultado);
+
+    agregarLog(`Resultado decimal: ${resultado}`);
+    agregarLog(`Resultado binario: ${bin}`);
+
+    valor = bin;
     operador = "";
     memoria = "";
     actualizarDisplay();
 }
 
 function complemento2() {
-    if (!valor) return;
+    let original = valor;
+    let bits = valor.split('').map(b => b === '0' ? '1' : '0');
 
-    let bits = valor.split('');
-    
-    // invertir bits
-    bits = bits.map(b => b === '0' ? '1' : '0');
-
-    // sumar 1
     let carry = 1;
     for (let i = bits.length - 1; i >= 0; i--) {
         if (bits[i] === '1' && carry === 1) {
@@ -150,7 +215,11 @@ function complemento2() {
         }
     }
 
-    valor = bits.join('');
+    let resultado = bits.join('');
+
+    agregarLog(`C2 de ${original} → ${resultado}`);
+
+    valor = resultado;
     actualizarDisplay();
 }
 </script>
